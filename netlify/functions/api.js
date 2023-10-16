@@ -1,7 +1,55 @@
+import 'dotenv/config'
 import express, { Router } from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
+import mongoose from "mongoose";
 import serverless from "serverless-http";
 
 const api = express();
+
+api.use(cors())
+api.use(bodyParser.json())
+
+mongoose.connect(process.env.DATABASE_URL)
+
+const authorSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    }
+})
+const Author = mongoose.model('Author', authorSchema)
+
+const bookSchema = new mongoose.Schema({
+    title: {
+        type: String,
+        required: true
+    },
+    publishDate: {
+        type: Number,
+        required: true
+    },
+    author: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'Author'
+    }
+})
+
+const Book = mongoose.model('Book', bookSchema)
+
+const userSchema = new mongoose.Schema({
+    userEmail: {
+        type: String,
+        required: true
+    },
+    lastLogin: {
+        type: Date,
+        required: true
+    }
+})
+
+const User = mongoose.model('User', userSchema)
 
 const router = Router();
 router.get("/hello", (req, res) => res.send("Hello World!"));
